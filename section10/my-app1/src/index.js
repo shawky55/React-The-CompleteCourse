@@ -4,9 +4,13 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+import { AtuhContextProvider } from './store/auth-context';
+
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+   <AtuhContextProvider>
+     <App></App>
+   </AtuhContextProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );

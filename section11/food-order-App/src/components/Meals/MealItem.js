@@ -13,7 +13,7 @@ const MealItem = (props) => {
           <div className={classes.price}>{data.price}</div>
         </div>
         <div>
-          <MealItemForm></MealItemForm>
+          <MealItemForm mealId={data.id}></MealItemForm>
         </div>
       </li>
     </React.Fragment>

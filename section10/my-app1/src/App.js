@@ -1,35 +1,20 @@
-import React, { useState } from 'react';
-
+import React from 'react';
+import AtuhContext from './store/auth-context';
 import Login from './components/Login/Login';
 import Home from './components/Home/Home';
 import MainHeader from './components/MainHeader/MainHeader';
-export const AuthContext = React.createContext({
-  isLoggedIn: false,
-  onLogout: () => {},
-});
+import { useContext } from 'react';
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  const loginHandler = (email, password) => {
-    localStorage.setItem('is Loggedin', '1');
-    setIsLoggedIn(true);
-  };
-
-  const logoutHandler = () => {
-    setIsLoggedIn(false);
-  };
-
+  const ctx=useContext(AtuhContext)
   return (
-    <AuthContext.Provider
-      value={{ isLoggedIn: isLoggedIn, onLogout: logoutHandler }}
-    >
-      <MainHeader onLogout={logoutHandler} />
+    <>
+      <MainHeader/>
       <main>
-        {!isLoggedIn && <Login onLogin={loginHandler} />}
-        {isLoggedIn && <Home onLogout={logoutHandler} />}
+        {!ctx.isLoggedIn && <Login  />}
+        {ctx.isLoggedIn && <Home />}
       </main>
-    </AuthContext.Provider>
+    </>
   );
 }
 

@@ -1,142 +1,135 @@
-import React, { useState, useEffect, useReducer } from 'react';
+import React, { useState } from 'react';
 
 import Card from '../UI/Card/Card';
 import classes from './Login.module.css';
 import Button from '../UI/Button/Button';
-const USER_INPUT_EMAIL = 'USER_INPUT_EMAIL';
-const USER_INPUT_PASSWORD = 'USER_INPUT_PASSWORD';
-function emailReducer(state, actions) {
-  function CheckingEmail(value) {
-    return value.includes('@');
-  }
-  if (actions.type === USER_INPUT_EMAIL) {
-    return { value: actions.value, isVaild: CheckingEmail(actions.value) };
-  }
-
-  return { value: actions.value, isVaild: false };
-}
-function passwordReducer(state, actions) {
-  const CheckingPassword = (pass) => {
-    // console.log(pass.trim().length > 6);
-    return pass.trim().length > 6;
-  };
-  if (actions.type === USER_INPUT_PASSWORD) {
+import { useEffect, useReducer } from 'react';
+import { useContext } from 'react';
+import AtuhContext from '../../store/auth-context';
+import Input from '../UI/Input/Input';
+// const emailReducerHandler = (state, action) => {
+//   if (action.type === 'input_user') {
+//     return { value: action.value, isVaild: action.value.includes('@') };
+//   }
+//   return { value: '', isVaild: null };
+// };
+// const passwordReducerHandler = (state, action) => {
+//   if (action.type == 'input_password') {
+//     return { value: action.value, isVaild: action.value.trim().length > 6 };
+//   }
+//   return { value: '', isVaild: null };
+// };
+const loginReducerHandler = (state, action) => {
+  const checkEmail = (email) => email.includes('@');
+  const chekPassword = (password) => password.trim().length > 6;
+  if (action.type === 'EMAIL_INPUT') {
     return {
-      value: actions.value,
-      isVaild: CheckingPassword(actions.value),
+      emailValue: action.value,
+      emailIsValid: checkEmail(action.value),
+      passwordValue: state.passwordValue,
+      passwordIsValid: state.passwordIsValid,
+    };
+  }
+  if (action.type === 'PASSWORD_INPUT') {
+    return {
+      emailValue: state.emailValue,
+      emailIsValid: state.emailIsValid,
+      passwordValue: action.value,
+      passwordIsValid: chekPassword(action.value),
     };
   }
 
-  return { value: actions.value, isVaild: false };
-}
-
+  return {
+    emailValue: '',
+    passwordValue: '',
+    emailIsValid: null,
+    passwordIsValid: null,
+  }; //initail state
+};
 const Login = (props) => {
-  const [emailState, dispatchEmail] = useReducer(emailReducer, {
-    value: '',
-    isVaild: null,
-  });
-  const [passwordState, dispatchPassword] = useReducer(passwordReducer, {
-    value: '',
-    isVaild: null,
-  });
   // const [enteredEmail, setEnteredEmail] = useState('');
   // const [emailIsValid, setEmailIsValid] = useState();
   // const [enteredPassword, setEnteredPassword] = useState('');
   // const [passwordIsValid, setPasswordIsValid] = useState();
   const [formIsValid, setFormIsValid] = useState(false);
-
-  // useEffect(() => {
-  //   console.log('EFFECT RUNNING');
-
-  //   return () => {
-  //     console.log('EFFECT CLEANUP');
-  //   };
-  // }, []);
-
-  // useEffect(() => {
-  //   const identifier = setTimeout(() => {
-  //     console.log('Checking form validity!');
-  //     setFormIsValid(
-  //       enteredEmail.includes('@') && enteredPassword.trim().length > 6
-  //     );
-  //   }, 500);
-
-  //   return () => {
-  //     console.log('CLEANUP');
-  //     clearTimeout(identifier);
-  //   };
-  // }, [enteredEmail, enteredPassword]);
-
-  const { isVaild: emailValidState } = emailState;
-  const { isVaild: passwordValidState } = passwordState;
-
+  // const [passwordEntered, setPasswordReducer] = useReducer(
+  //   passwordReducerHandler,
+  //   { value: '', isVaild: null }
+  // );
+  // const [emailEntered, setEmailReducer] = useReducer(emailReducerHandler, {
+  //   value: '',
+  //   isVaild: null,
+  // });
+  /**
+   * instead of create two reducer create one
+   */
+  const [loginDataEnterd, setLoginReducer] = useReducer(loginReducerHandler, {
+    emailValue: '',
+    passwordValue: '',
+    emailIsValid: null,
+    passwordIsValid: null,
+  });
+  // const emaliValidState = emailEntered.isVaild;
+  // const passwordValidState = passwordEntered.isVaild;
+  const emaliValidState = loginDataEnterd.emailIsValid;
+  const passwordValidState = loginDataEnterd.passwordIsValid;
   useEffect(() => {
-    let identifier = setTimeout(() => {
-      console.log('check valid');
-      setFormIsValid(emailValidState && passwordValidState);
-    }, 500);
+    const identifier = setTimeout(() => {
+      console.log('send request');
+      setFormIsValid(emaliValidState && passwordValidState);
+    }, 1000);
 
     return () => {
-      console.log('CLEANUP');
       clearTimeout(identifier);
     };
-  }, [emailValidState, passwordValidState]);
-  const emailChangeHandler = (event) => {
-    dispatchEmail({ type: USER_INPUT_EMAIL, value: event.target.value });
+  }, [emaliValidState, passwordValidState]);
 
-    // setFormIsValid(emailState.isVaild && passwordState.isVaild);
+  const emailChangeHandler = (event) => {
+    setLoginReducer({ type: 'EMAIL_INPUT', value: event.target.value });
+
+    // setFormIsValid(
+    //   event.target.value.includes('@') && enteredPassword.trim().length > 6
+    // );
   };
 
   const passwordChangeHandler = (event) => {
-    dispatchPassword({ type: USER_INPUT_PASSWORD, value: event.target.value });
+    setLoginReducer({ type: 'PASSWORD_INPUT', value: event.target.value });
 
-    // setFormIsValid(emailState.isVaild && passwordState.isVaild);
+    // setFormIsValid(
+    //   event.target.value.trim().length > 6 && enteredEmail.includes('@')
+    // );
   };
 
   // const validateEmailHandler = () => {
-  //   setEmailIsValid(emailState.isVaild);
+  //   setEmailIsValid(emailEntered.value.includes('@'));
   // };
 
   // const validatePasswordHandler = () => {
   //   setPasswordIsValid(enteredPassword.trim().length > 6);
   // };
-
+  const ctx = useContext(AtuhContext);
   const submitHandler = (event) => {
     event.preventDefault();
-    props.onLogin(emailState.value, passwordState.value);
+    ctx.onLogin(loginDataEnterd.emailValue, loginDataEnterd.passwordValue);
   };
 
   return (
     <Card className={classes.login}>
       <form onSubmit={submitHandler}>
-        <div
-          className={`${classes.control} ${
-            emailState.isVaild === false ? classes.invalid : ''
-          }`}
-        >
-          <label htmlFor="email">E-Mail</label>
-          <input
-            type="email"
-            id="email"
-            value={emailState.value}
-            onChange={emailChangeHandler}
-            // onBlur={validateEmailHandler}
-          />
-        </div>
-        <div
-          className={`${classes.control} ${
-            passwordState.isVaild === false ? classes.invalid : ''
-          }`}
-        >
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            value={passwordState.value}
-            onChange={passwordChangeHandler}
-            // onBlur={validatePasswordHandler}
-          />
-        </div>
+        <Input
+        type="email"
+        id="email_field"
+        value={loginDataEnterd.emailValue}
+        onChange={emailChangeHandler}
+        isValid={loginDataEnterd.emailIsValid}
+        />
+      <Input
+      type="password"
+      id="password_field"
+      value={loginDataEnterd.passwordValue}
+      onChange={passwordChangeHandler}
+      isValid={loginDataEnterd.passwordIsValid}
+      />
         <div className={classes.actions}>
           <Button type="submit" className={classes.btn} disabled={!formIsValid}>
             Login
