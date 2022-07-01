@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState ,useRef} from 'react';
+
 
 import Card from '../UI/Card/Card';
 import classes from './Login.module.css';
@@ -107,16 +108,25 @@ const Login = (props) => {
   // const validatePasswordHandler = () => {
   //   setPasswordIsValid(enteredPassword.trim().length > 6);
   // };
+  const emailInputRef=useRef();
+  const passwordInputRef=useRef();
   const ctx = useContext(AtuhContext);
   const submitHandler = (event) => {
     event.preventDefault();
-    ctx.onLogin(loginDataEnterd.emailValue, loginDataEnterd.passwordValue);
+    if(formIsValid){
+      ctx.onLogin(loginDataEnterd.emailValue, loginDataEnterd.passwordValue);
+    }else if(!loginDataEnterd.emailIsValid){
+      emailInputRef.current.focus();
+    }else{
+      passwordInputRef.current.focus();
+    }
   };
 
   return (
     <Card className={classes.login}>
       <form onSubmit={submitHandler}>
         <Input
+        ref={emailInputRef}
         type="email"
         id="email_field"
         value={loginDataEnterd.emailValue}
@@ -124,6 +134,7 @@ const Login = (props) => {
         isValid={loginDataEnterd.emailIsValid}
         />
       <Input
+      ref={passwordInputRef}
       type="password"
       id="password_field"
       value={loginDataEnterd.passwordValue}
@@ -131,7 +142,7 @@ const Login = (props) => {
       isValid={loginDataEnterd.passwordIsValid}
       />
         <div className={classes.actions}>
-          <Button type="submit" className={classes.btn} disabled={!formIsValid}>
+          <Button type="submit" className={classes.btn}>
             Login
           </Button>
         </div>
