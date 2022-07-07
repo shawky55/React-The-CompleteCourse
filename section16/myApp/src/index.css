@@ -51,7 +51,13 @@ body {
   border-color: #240370;
   background-color: #e0d4fd;
 }
-
+button:disabled:active,
+button:disabled:hover,
+button:disabled {
+  background-color: gray;
+  color: #3f3f3f;
+  cursor: not-allowed;
+}
 .control-group {
   display: flex;
   column-gap: 1rem;
