@@ -102,8 +102,6 @@ const SimpleInput = (props) => {
           value={nameInputValue}
           onChange={nameChangeHandler}
           onBlur={nameBlurHandler}
-
-          // ref={inputValue}
         />
       </div>
       {nameInputError && (
